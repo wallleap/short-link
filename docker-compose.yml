@@ -1,0 +1,36 @@
+version: "3.5"
+
+networks:
+  unique_shorturl_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.1
+
+services:
+  redis6:
+    image: hub.vonne.me/redis:6
+    networks:
+      - unique_shorturl_net
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis6-data:/data
+      - redis6-conf:/etc/redis
+  shorturl:
+    image: hub.vonne.me/wallleap/short-url:1.1
+    networks:
+      - unique_shorturl_net
+    ports:
+      - "30001:3001"
+    volumes:
+      - shorturl-data:/app
+    environment:
+      REDIS_HOST: redis6
+      REDIS_PORT: 6379
+
+volumes:
+  redis6-data:
+  redis6-conf:
+  shorturl-data:
